@@ -1,6 +1,9 @@
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
+from xfoilpython.main import load_airfoil
+from src.xfoil.xfoil import XFoil
+
 
 # naca4412 param
 m = 0.04  # maximum camber
@@ -72,10 +75,16 @@ def plot_from_csv(filename):
     plt.show()
 
 
-airfoil_points = naca4412_points(200, length=1.0, thickness=0.12)
+def generate(n, l, t):
+    airfoil_points = naca4412_points(n, length=l, thickness=t)
+    filtered_points = remove_close_points(airfoil_points, 0.00001)
+    save_to_csv(filtered_points, 'naca4412_airfoil_points.csv')
+
+"""airfoil_points = naca4412_points(200, length=1.3, thickness=0.3)
 
 filtered_points = remove_close_points(airfoil_points, 0.00001)
 
 save_to_csv(filtered_points, 'naca4412_airfoil_points.csv')
 
 plot_from_csv('naca4412_airfoil_points.csv')
+"""
