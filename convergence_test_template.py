@@ -6,7 +6,7 @@ from naca_generator import generate
 
 
 def get_gradient(x):
-    delta = 1e-3
+    delta = 1e-2
     upper = xfoil_drag_result(x + delta)
     lower = xfoil_drag_result(x - delta)
     gradient = (upper - lower) / (2 * delta)
@@ -28,7 +28,7 @@ def xfoil_drag_result(x):
 def main():
     airfoil_thickness = 0.12
     grad = np.inf
-    learning_rate = 1e-2
+    learning_rate = 1e-1
     grad_values = []
     cost_values = []
     x_values = []
@@ -41,9 +41,9 @@ def main():
         cd = xfoil_drag_result(airfoil_thickness)
         t = airfoil_thickness
 
-        results_list.append((cd, t))
+        results_list.append((cd, t, grad))
         for result in results_list:
-            print(f"{result[0]:.5f}, {result[1]:.5f}")
+            print(f"Drag: {result[0]:.8f}, T: {result[1]:.8f}, Grad: {result[2]:.8f}")
         _ = input()
         grad_values.append(airfoil_thickness)
         cost_values.append(xfoil_drag_result(airfoil_thickness))
