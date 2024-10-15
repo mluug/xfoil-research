@@ -13,16 +13,65 @@ def get_gradient(x):
     return gradient
 
 
+def extrapolate(cd_list):
+    cd_array = np.array(cd_list)
+
+    # if not np.isnan(cd_array).any(): return cd_array  # return original if no NaN
+
+    nan_i = np.where(np.isnan(cd_array))[0]
+    valid_i = np.where(~np.isnan(cd_array))[0]
+
+    for i in nan_i:
+        if i == 0:
+            cd_array[i] = cd_array[valid_i[0]]
+        elif i == len(cd_array) - 1:
+            cd_array[i] = cd_array[valid_i[-1]]
+        else:
+            prev_valid = valid_i[valid_i < i].max()  # first valid to the left
+            next_valid = valid_i[valid_i > i].min()  # first valid to the right
+
+            cd_prev = cd_array[prev_valid]
+            cd_next = cd_array[next_valid]
+            t_prev = prev_valid
+            t_next = next_valid
+
+            # extrapolation (linear)
+            cd_array[i] = cd_prev + (cd_next - cd_prev) * (i - t_prev) / (t_next - t_prev)
+
+    return cd_array
+
+
+def visualize(list):
+    x = np.arange(len(list))
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(x, list, marker='o', label='cd')
+    plt.xlabel('i')
+    plt.ylabel('coeff')
+    plt.title('cd')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+
 def xfoil_drag_result(x):
     generate(150, 1.0, x)
     xf = XFoil()
-    xf.airfoil = load_airfoil('naca4412_airfoil_points.csv')
+    xf.airfoil = load_airfoil('naca4412_airfoil_points_tmp.csv')
     xf.Re = 1e6
     xf.max_iter = 150
     xf.n_crit = 9
-    a, cl, cd, cm, cp = xf.aseq(-5, 5, 0.5)
+    a, cl, cd, cm, cp = xf.aseq(-1, 1, 0.5)
 
-    return np.nanmean(cd)
+    if np.isnan(cd).any():
+        print(cd)
+        cd = extrapolate(cd)
+        visualize(cd)
+        return np.mean(cd)
+    else:
+        print(cd)
+        visualize(cd)
+        return np.mean(cd)
 
 
 def main():

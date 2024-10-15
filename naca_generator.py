@@ -78,7 +78,7 @@ def plot_from_csv(filename):
 def generate(n, l, t):
     airfoil_points = naca4412_points(n, length=l, thickness=t)
     filtered_points = remove_close_points(airfoil_points, 0.00001)
-    save_to_csv(filtered_points, 'naca4412_airfoil_points.csv')
+    save_to_csv(filtered_points, 'naca4412_airfoil_points_tmp.csv')
 
 """airfoil_points = naca4412_points(200, length=1.3, thickness=0.3)
 
